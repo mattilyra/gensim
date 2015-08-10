@@ -829,11 +829,15 @@ class LdaModel(interfaces.TransformationABC):
         """
         return self.get_document_topics(bow, eps)
 
-    def save(self, fname, *args, **kwargs):
+    def save(self, fname, ignore=['state', 'dispatcher'], *args, **kwargs):
         """
         Save the model to file.
 
-        Large internal arrays may be stored into separate files, with `fname` as prefix.
+        Large internal arrays may be stored into separate files, with `fname` as prefix. Use
+        `separately=[]` to define which arrays should be stored in separate
+        files. The `ignore` parameter can be used to define which variables should be ignored.
+        By default the internal `state` is ignored as it uses its own serialisation not the
+        one provided by `LdaModel`.
 
         Note: do not save as a compressed file if you intend to load the file back with `mmap`.
 
@@ -850,7 +854,7 @@ class LdaModel(interfaces.TransformationABC):
         """
         if self.state is not None:
             self.state.save(utils.smart_extension(fname, '.state'), *args, **kwargs)
-        super(LdaModel, self).save(fname, *args, ignore=['state', 'dispatcher'], **kwargs)
+        super(LdaModel, self).save(fname, *args, ignore=ignore, **kwargs)
 
     @classmethod
     def load(cls, fname, *args, **kwargs):
